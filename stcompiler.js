@@ -149,3 +149,41 @@ function parser(tokens){
     return ast;
 
 }
+
+function traverser(ast,visitor){
+    function traverseArray(array,parent){
+        array.forEach(child => {
+            traverseNode(child,parent);
+        });
+    }
+
+    function traverseNode(child,parent){
+        let methods = visitor[node.type];
+
+        if(methods && methods.enter){
+            methods.enter(node,parent);
+        }
+
+        switch(node.type){
+            //recursively go trough ast 
+            case 'Program':
+                traverseArray(node.body, node);
+                break;
+            
+                case 'CallExpression':
+                    traverseArray(node.params,node);
+                
+                case 'NumberLiteral':
+                case 'StringLiteral':
+                    break;
+                
+                default:
+                    throw new TypeError(node.type);
+
+        }
+
+        if(methods && methods.exit){
+            methods.exit(node,parent);
+        }
+    }
+}
